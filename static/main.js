@@ -24,7 +24,7 @@ const Login = {
       token: ""
     }
   },
-  template: '<div><input v-model="email"><br><input v-model="pass"><br><button v-on:click="sendLogin">Login</button><br></div>',
+  template: '<div>Username: <input v-model="email"><br>Password: <input v-model="pass"><br><button v-on:click="sendLogin">Login</button><br></div>',
   methods: {
     sendLogin: function() {
       console.log("sendLogin");
@@ -54,7 +54,7 @@ const User = {
       newInfo: ''
 		}
 	},
-	template: '<div>Share your links: http://127.0.0.1:9000/#/v/{{sharedState.user_id}}<br> \
+	template: '<div>Share your links: https://thawing-savannah-46774.herokuapp.com/#/v/{{sharedState.user_id}}<br> \
               <div>\
                 Add link:<br>\
                 Url: <input v-model="newUrl"><br>\
