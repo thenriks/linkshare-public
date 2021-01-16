@@ -11,7 +11,7 @@ pwd_context = CryptContext(
 
 
 def get_user(username: str):
-    r = redis.from_url(os.environ.get("REDIS_TLS_URL"))
+    r = redis.from_url(os.environ.get("REDIS_URL"))
 
     if r.hexists("user:" + username, "id") is False:
         return None
@@ -22,7 +22,7 @@ def get_user(username: str):
 
 
 def check_password(username: str, password: str):
-    r = redis.from_url(os.environ.get("REDIS_TLS_URL"))
+    r = redis.from_url(os.environ.get("REDIS_URL"))
 
     passHash = r.hget("user:" + username, "password").decode("utf-8")
 
@@ -34,7 +34,7 @@ def check_password(username: str, password: str):
 
 # return True if succesfully added
 def add_user(username: str, email: str, password: str, info: str):
-    r = redis.from_url(os.environ.get("REDIS_TLS_URL"))
+    r = redis.from_url(os.environ.get("REDIS_URL"))
 
     # username already in use
     if r.hexists("user:" + username, "id"):
