@@ -1,17 +1,11 @@
 # Link loading and adding
 import redis
 import os
-try:
-    import creds
-except ImportError:
-    pass
 
 # load links of user specified
 def load_links(user: int):
-    if creds.REDISPATH is not None:
-        r = redis.Redis(host=creds.REDISPATH, port=creds.REDISPORT, password=creds.REDISPASS)
-    else:
-        r = redis.from_url(os.environ.get("REDIS_TLS_URL"))
+    r = redis.from_url(os.environ.get("REDIS_URL"))
+    
     links = []
 
     owned = r.lrange("owned:" + str(user), 0, -1)
@@ -33,10 +27,7 @@ def load_links(user: int):
 
 
 def add_link(url: str, info: str, uid: int):
-    if creds.REDISPATH is not None:
-        r = redis.Redis(host=creds.REDISPATH, port=creds.REDISPORT, password=creds.REDISPASS)
-    else:
-        r = redis.from_url(os.environ.get("REDIS_TLS_URL"))
+    r = redis.from_url(os.environ.get("REDIS_URL"))
 
     nid = r.incr("link_count")
     r.hset("links:" + str(nid), key="url", value=url)
