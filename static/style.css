@@ -1,0 +1,18 @@
+body {
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+#topBar {
+	padding-top: 3px;
+	padding-bottom: 3px;
+	background-color: #99ccff;
+}
+
+table {
+  border-collapse: separate;
+  border-spacing: 10px 5px;
+}
+
+th, td {
+	border-bottom: 1px solid #99ccff;
+}

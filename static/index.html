@@ -1,0 +1,27 @@
+<!doctype html>
+<head>
+  <link rel="stylesheet" href="style.css">
+</head> 
+
+<meta charset="UTF-8">
+
+<!--<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>-->
+<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<title>Linker</title>
+
+<div id="app">
+  <div id="topBar">
+    <router-link to="/login" v-if="!logged">Login</router-link>
+    <router-link to="/signup" v-if="!logged">Sign up</router-link>
+    <a href="#" v-on:click="logOut" v-else>Log out</a>
+    {{status}}
+  </div>
+
+    <router-view></router-view>
+</div>
+
+<script src="main.js">
+</script>

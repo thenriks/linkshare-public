@@ -1,0 +1,10 @@
+fastapi_login==1.5.1
+passlib==1.7.2
+redis==3.5.3
+pydantic==1.6.1
+starlette==0.13.6
+creds==1.0.15
+fastapi==0.63.0
+uvicorn==0.12.3
+aiofiles==0.6.0
+python-multipart==0.0.5
