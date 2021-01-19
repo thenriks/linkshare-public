@@ -5,7 +5,7 @@ import os
 
 # load links of user specified
 def load_links(user: int):
-    r = redis.StrictRedis.from_url(os.environ.get("REDIS_TLS_URL"))
+    r = redis.from_url(os.environ.get("REDIS_URL"))
 
     links = []
 
@@ -29,7 +29,7 @@ def load_links(user: int):
 
 
 def add_link(url: str, info: str, uid: int):
-    r = redis.StrictRedis.from_url(os.environ.get("REDIS_TLS_URL"))
+    r = redis.from_url(os.environ.get("REDIS_URL"))
 
     nid = r.incr("link_count")
     r.hset("links:" + str(nid), key="url", value=url)
@@ -39,7 +39,7 @@ def add_link(url: str, info: str, uid: int):
 
 
 def switch_state(link: int, user: int):
-    r = redis.StrictRedis.from_url(os.environ.get("REDIS_TLS_URL"))
+    r = redis.from_url(os.environ.get("REDIS_URL"))
 
     print("links.switch_state()")
     # check if user owns this link
