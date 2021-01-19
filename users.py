@@ -74,7 +74,7 @@ def user_info(uid: int):
 
 
 def get_newest():
-    r = redis.from_url(os.environ.get("REDIS_URL") + "?ssl_cert_reqs=None")
+    r = redis.from_url(os.environ.get("REDIS_URL") + "?verify_mode=OpenSSL::SSL::VERIFY_NONE ")
 
     new_users = r.lrange("newest", 0, -1)
 
