@@ -8,7 +8,8 @@ var store = {
     links: [],
     username: "",
     user_id: 0,
-    token: ""
+    token: "",
+    userInfo: ""
   },
   setLinks (newValue) {
     this.state.links = newValue
@@ -19,6 +20,7 @@ var store = {
 const Login = {
   data: function () {
     return {
+      sharedState: store.state,
       email: "",
       pass: "",
       token: ""
@@ -37,6 +39,7 @@ const Login = {
             this.res = response;
             this.token = response.data.token_type + ' ' + response.data.access_token;
             this.$root.$emit('setToken', this.token, this.email, response.data.user_id);
+            this.sharedState.userInfo = response.data.info;
             console.log(this.token);
           })
           .catch(e => {
@@ -55,10 +58,11 @@ const User = {
 		}
 	},
 	template: '<div>Share your links: https://thawing-savannah-46774.herokuapp.com/#/v/{{sharedState.user_id}}<br> \
+              <div><b>Your info:</b> {{sharedState.userInfo}}</div>\
               <div>\
                 Add link:<br>\
-                Url: <input v-model="newUrl"><br>\
-                Info: <input v-model="newInfo"><br>\
+                Url: <input v-model="newUrl" maxlength="2000"><br>\
+                Info: <input v-model="newInfo" maxlength="100"><br>\
                 <button v-on:click="sendNewLink">Add</button><br>\
               </div>\
               My links:<br>\
@@ -66,8 +70,10 @@ const User = {
                 <tr v-for=\"link in sharedState.links\" :key=\"link.url\"> \
                   <td><a v-bind:href=link.url target=\"_blank\">Go</a></td>\
                   <td>{{ link.info }}</td> \
+                  <td><td><button v-on:click="switchState(link.id)" v-if="link.hidden">Show</button>\
+                  <button v-on:click="switchState(link.id)" v-else>Hide</button></td>\
                 </tr> \
-              </table>',
+              </table></div>',
   methods: {
     sendNewLink: function() {
       console.log("sendNewLink");
@@ -93,6 +99,26 @@ const User = {
           .catch(e => {
             console.log(e);
           });
+    },
+    switchState: function(id) {
+      data = {
+        linkId: id 
+      }
+
+      axios.post('/switch_state', data, { headers: { Authorization: this.sharedState.token }})
+          .then(response => {
+            // Update link list
+            axios.get('/links/' + this.sharedState.user_id)
+              .then(response => {
+                this.sharedState.links = response.data;
+              })
+              .catch(e => {
+                console.log(e);
+              });
+          })
+          .catch(e => {
+            console.log(e);
+          });
     }
   }
 }
@@ -102,22 +128,25 @@ const ShowUser = {
     return {
       loading: false,
       userLinks: [],
+      userInfo: "",
       sharedState: store.state,
     }
   },
   created: function() {
     this.getLinks();
+    this.getUserInfo();
   },
   watch: {
     '$route': 'getLinks'
   },
   template: '<div>Links for user {{ $route.params.id }} <br> \
+              <b>Info: </b> {{this.userInfo}} <br>\
               <div v-if="loading"> \
                 Loading... \
               </div> \
               <div v-else> \
                 <table id=\"user-links\"> \
-                  <tr v-for=\"link in userLinks\" :key=\"link.url\"> \
+                  <tr v-for=\"link in userLinks\" :key=\"link.url\" v-if="!link.hidden"> \
                     <td><a v-bind:href=link.url target=\"_blank\">Go</a></td>\
                     <td>{{ link.info }}</td> \
                   </tr> \
@@ -131,6 +160,17 @@ const ShowUser = {
               .then(response => {
                 this.loading = false;
                 this.userLinks = response.data;
+              })
+              .catch(e => {
+                console.log(e);
+              });
+    },
+    getUserInfo() {
+      this.loading = true;
+      axios.get('/user_info/' + this.$route.params.id)
+              .then(response => {
+                this.loading = false;
+                this.userInfo = response.data;
               })
               .catch(e => {
                 console.log(e);
@@ -149,13 +189,12 @@ const SignUp = {
       newUserInfo: ''
     }
   },
-  template: '<div>Create new account.\
-              <div>\
-                Username: <input v-model="newUname"><br>\
-                E-mail: <input v-model="newEmail"><br>\
-                Password: <input v-model="newPass"><br>\
+  template: '<div>Create new account.<br>\
+                Username: <input v-model="newUname" maxlength="32"><br>\
+                E-mail: <input v-model="newEmail" maxlength="64"><br>\
+                Password: <input v-model="newPass" maxlength="64"><br>\
+                User info: <textarea v-model="newUserInfo" maxlength="300"></textarea><br>\
                 <button v-on:click="sendSignUp">Send</button><br>\
-              </div> \
             </div>',
   methods: {
     sendSignUp: function() {

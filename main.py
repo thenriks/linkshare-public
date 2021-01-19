@@ -23,14 +23,6 @@ app.mount("/-", StaticFiles(directory="static", html=True), name="static")
 origins = [
     "http://localhost",
     "http://localhost:8080",
-    "http://127.0.0.1:8000/*",
-    "http://127.0.0.1:8000",
-    "http://127.0.0.1:8000/login",
-    "http://127.0.0.1:8000/links",
-    "http://127.0.0.1:8000/links/2",
-    "http://127.0.0.1:9000/prot",
-    "http://127.0.0.1:9000/login",
-    "http://127.0.0.1:9000",
     "*"
 ]
 
@@ -47,6 +39,10 @@ class Link(BaseModel):
     url: str
     info: str
     uid: int
+
+
+class LinkState(BaseModel):
+    linkId: int
 
 
 class User(BaseModel):
@@ -71,7 +67,6 @@ app.add_exception_handler(NotAuthenticatedException, exc_handler)
 
 @manager.user_loader
 def load_user(username: str):
-    # user = fake_db.get(email)
     user = users.get_user(username)
     return user
 
@@ -91,7 +86,7 @@ def login(data: OAuth2PasswordRequestForm = Depends()):
         data=dict(sub=username), expires_delta=timedelta(hours=1)
     )
 
-    return {'access_token': access_token, 'token_type': 'bearer', 'user_id': user['id']}
+    return {'access_token': access_token, 'token_type': 'bearer', 'user_id': user['id'], 'info': user['info']}
 
 
 @app.get("/")
@@ -100,6 +95,7 @@ async def main():
 
 
 # Get links owned by specified user
+# TODO: Separate link loading for owner and others so no hidden links are sen to others
 @app.get("/links/{user_id}")
 async def get_links(user_id):
     user_links = None
@@ -112,17 +108,36 @@ async def get_links(user_id):
 # Add link
 @app.post("/add_link/")
 async def add_link(link: Link, user=Depends(manager)):
-    # Voisi palauttaa nykyisen linkkilistan?
+    if len(link.url) > 2000 or len(link.info) > 100:
+        return "Error adding link!"
 
     if link.uid == user.get("id"):
         links.add_link(link.url, link.info, user.get("id"))
 
+    return "Link added!"
+
+
+# Switch Link visibility
+@app.post("/switch_state/")
+async def switch_state(state: LinkState, user=Depends(manager)):
+    links.switch_state(state.linkId, user.get("id"))
+    print("switch_state")
+    return "OK"
+
 
 @app.post("/add_user/")
 async def add_user(newUser: User):
-    users.add_user(newUser.username, newUser.email, newUser.password, newUser.info)
+    result = users.add_user(newUser.username, newUser.email, newUser.password, newUser.info)
 
-    return "OK!"
+    if result:
+        return "User added."
+    else:
+        return "Could not add user."
+
+
+@app.get("/user_info/{user_id}")
+async def user_info(user_id: int):
+    return users.user_info(user_id)
 
 
 @app.get("/error")
