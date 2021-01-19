@@ -140,6 +140,11 @@ async def user_info(user_id: int):
     return users.user_info(user_id)
 
 
+@app.get("/new_users/")
+async def new_users():
+    return users.get_newest()
+
+
 @app.get("/error")
 async def login_error():
     return "Not logged in!"

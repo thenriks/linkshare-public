@@ -2,6 +2,7 @@
 from passlib.context import CryptContext
 import redis
 import os
+import creds
 
 
 pwd_context = CryptContext(
@@ -11,7 +12,8 @@ pwd_context = CryptContext(
 
 
 def get_user(username: str):
-    r = redis.from_url(os.environ.get("REDIS_URL"))
+    # r = redis.from_url(os.environ.get("REDIS_URL"))
+    r = redis.Redis(host=creds.REDISPATH, port=14893, password=creds.REDISPASS)
 
     if r.hexists("user:" + username, "id") is False:
         return None
@@ -23,7 +25,8 @@ def get_user(username: str):
 
 
 def check_password(username: str, password: str):
-    r = redis.from_url(os.environ.get("REDIS_URL"))
+    # r = redis.from_url(os.environ.get("REDIS_URL"))
+    r = redis.Redis(host=creds.REDISPATH, port=14893, password=creds.REDISPASS)
 
     passHash = r.hget("user:" + username, "password").decode("utf-8")
 
@@ -35,7 +38,8 @@ def check_password(username: str, password: str):
 
 # return True if succesfully added
 def add_user(username: str, email: str, password: str, info: str):
-    r = redis.from_url(os.environ.get("REDIS_URL"))
+    # r = redis.from_url(os.environ.get("REDIS_URL"))
+    r = redis.Redis(host=creds.REDISPATH, port=14893, password=creds.REDISPASS)
 
     # username already in use
     if r.hexists("user:" + username, "id"):
@@ -54,11 +58,17 @@ def add_user(username: str, email: str, password: str, info: str):
     r.hset("user:" + username, key="email", value=email)
     r.hset("user:" + username, key="info", value=info)
 
+    # List of newest users
+    r.lpush("newest", ucount)
+    if r.llen("newest") > 5:
+        r.rpop("newest")
+
     return True
 
 
 def user_info(uid: int):
-    r = redis.from_url(os.environ.get("REDIS_URL"))
+    # r = redis.from_url(os.environ.get("REDIS_URL"))
+    r = redis.Redis(host=creds.REDISPATH, port=14893, password=creds.REDISPASS)
 
     username = r.get("userid:" + str(uid))
 
@@ -66,3 +76,21 @@ def user_info(uid: int):
         return r.hget("user:" + username.decode("utf-8"), "info")
     else:
         return "UNDEFINED"
+
+
+def get_newest():
+    # r = redis.from_url(os.environ.get("REDIS_URL"))
+    r = redis.Redis(host=creds.REDISPATH, port=14893, password=creds.REDISPASS)
+
+    new_users = r.lrange("newest", 0, -1)
+
+    userlist = []
+
+    for x in new_users:
+        i = {}
+        i['id'] = "#/v/" + x.decode("utf-8")
+        name = r.get("userid:" + x.decode("utf-8")).decode("utf-8")
+        i['username'] = name
+        userlist.append(i)
+
+    return userlist

@@ -1,11 +1,13 @@
 # Link loading and adding
 import redis
 import os
+import creds
 
 
 # load links of user specified
 def load_links(user: int):
-    r = redis.from_url(os.environ.get("REDIS_URL"))
+    # r = redis.from_url(os.environ.get("REDIS_URL"))
+    r = redis.Redis(host=creds.REDISPATH, port=14893, password=creds.REDISPASS)
 
     links = []
 
@@ -29,7 +31,8 @@ def load_links(user: int):
 
 
 def add_link(url: str, info: str, uid: int):
-    r = redis.from_url(os.environ.get("REDIS_URL"))
+    # r = redis.from_url(os.environ.get("REDIS_URL"))
+    r = redis.Redis(host=creds.REDISPATH, port=14893, password=creds.REDISPASS)
 
     nid = r.incr("link_count")
     r.hset("links:" + str(nid), key="url", value=url)
@@ -39,8 +42,8 @@ def add_link(url: str, info: str, uid: int):
 
 
 def switch_state(link: int, user: int):
-    r = redis.from_url(os.environ.get("REDIS_URL"))
-
+    # r = redis.from_url(os.environ.get("REDIS_URL"))
+    r = redis.Redis(host=creds.REDISPATH, port=14893, password=creds.REDISPASS)
     print("links.switch_state()")
     # check if user owns this link
     owned = r.lrange("owned:" + str(user), 0, -1)

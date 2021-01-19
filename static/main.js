@@ -215,7 +215,49 @@ const SignUp = {
   }
 };
 
+const FrontPage = {
+  data: function () {
+    return {
+      loading: false,
+      sharedState: store.state,
+      newUsers: []
+    }
+  },
+  created: function() {
+    this.getUsers();
+  },
+  template: '<div>\
+              <div>Link sharing website. Under development, not meant for real use, database may be wiped anytime.</div>\
+              <div>Source: https://github.com/thenriks/linkshare-public</div>\
+              <div>Newest members:</div>\
+              <div v-if="loading"> \
+                Loading... \
+              </div> \
+              <div v-else>\
+                <table id=\"new-users\"> \
+                  <tr v-for=\"user in newUsers\" :key=\"user.username\"> \
+                    <td><a v-bind:href=user.id> {{user.username}} </a></td>\
+                  </tr> \
+                </table> \
+              </div>\
+            </div>',
+  methods: {
+    getUsers() {
+      this.loading = true;
+      axios.get('/new_users/')
+              .then(response => {
+                this.loading = false;
+                this.newUsers = response.data;
+              })
+              .catch(e => {
+                console.log(e);
+              });
+    }
+  }
+};
+
 const routes = [
+  { path: '/', component: FrontPage},
   { path: '/login', component: Login },
   { path: '/user/:id', component: User },
   { path: '/v/:id', component: ShowUser },
