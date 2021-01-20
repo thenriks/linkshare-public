@@ -1,5 +1,6 @@
 body {
 	font-family: Arial, Helvetica, sans-serif;
+	width: 66%;
 }
 
 #topBar {
@@ -7,6 +8,13 @@ body {
 	padding-bottom: 3px;
 	background-color: #99ccff;
 }
+
+#messageBar {
+	padding-top: 3px;
+	padding-bottom: 3px;
+	background-color: #f7b0ed;
+}
+
 
 table {
   border-collapse: separate;

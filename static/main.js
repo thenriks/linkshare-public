@@ -6,6 +6,8 @@ var store = {
   debug: true,
   state: {
     links: [],
+    userFeedback: "Welcome",
+    showMessage: true,
     username: "",
     user_id: 0,
     token: "",
@@ -40,10 +42,11 @@ const Login = {
             this.token = response.data.token_type + ' ' + response.data.access_token;
             this.$root.$emit('setToken', this.token, this.email, response.data.user_id);
             this.sharedState.userInfo = response.data.info;
-            console.log(this.token);
           })
           .catch(e => {
-            console.log(e);
+            this.sharedState.showMessage = true;
+            this.sharedState.userFeedback = "Login Failed";
+            //console.log(e);
           });
     }
   }
@@ -206,6 +209,8 @@ const SignUp = {
       }
       axios.post('/add_user', data)
           .then(response => {
+            this.sharedState.userFeedback = response.data;
+            this.sharedState.showMessage = true;
             this.$router.push("/");
           })
           .catch(e => {

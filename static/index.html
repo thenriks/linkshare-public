@@ -19,6 +19,9 @@
     <a href="#" v-on:click="logOut" v-else>Log out</a>
     {{status}}
   </div>
+  <div v-if="sharedState.showMessage" v-on:click="sharedState.showMessage = false" id="messageBar">
+  	{{sharedState.userFeedback}}
+  </div>
 
     <router-view></router-view>
 </div>

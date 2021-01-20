@@ -130,9 +130,9 @@ async def add_user(newUser: User):
     result = users.add_user(newUser.username, newUser.email, newUser.password, newUser.info)
 
     if result:
-        return "User added."
+        return "Account created."
     else:
-        return "Could not add user."
+        return "Could not create account."
 
 
 @app.get("/user_info/{user_id}")
@@ -148,4 +148,3 @@ async def new_users():
 @app.get("/error")
 async def login_error():
     return "Not logged in!"
-

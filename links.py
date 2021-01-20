@@ -40,7 +40,6 @@ def add_link(url: str, info: str, uid: int):
 
 def switch_state(link: int, user: int):
     r = redis.from_url(os.environ.get("REDIS_URL") + "?ssl_cert_reqs=none")
-    # print("links.switch_state()")
     # check if user owns this link
     owned = r.lrange("owned:" + str(user), 0, -1)
 
