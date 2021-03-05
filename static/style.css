@@ -12,15 +12,12 @@ body {
 #messageBar {
 	padding-top: 3px;
 	padding-bottom: 3px;
-	background-color: #f7b0ed;
+	background-color: #f2f2f2;
 }
-
 
 table {
   border-collapse: separate;
-  border-spacing: 10px 5px;
+  background-color: #f2f2f2;
 }
 
-th, td {
-	border-bottom: 1px solid #99ccff;
-}
+tr:nth-child(even){background-color: #ffffff;}

@@ -28,7 +28,7 @@ const Login = {
       token: ""
     }
   },
-  template: '<div>Username: <input v-model="email"><br>Password: <input v-model="pass"><br><button v-on:click="sendLogin">Login</button><br></div>',
+  template: '<div>Username<br><input v-model="email"><br>Password<br><input type="password" v-model="pass"><br><button v-on:click="sendLogin">Login</button><br></div>',
   methods: {
     sendLogin: function() {
       console.log("sendLogin");
@@ -142,7 +142,7 @@ const ShowUser = {
   watch: {
     '$route': 'getLinks'
   },
-  template: '<div>Links for user {{ $route.params.id }} <br> \
+  template: '<div>\
               <b>Info: </b> {{this.userInfo}} <br>\
               <div v-if="loading"> \
                 Loading... \
@@ -189,14 +189,21 @@ const SignUp = {
       newUname: '',
       newEmail: '',
       newPass: '',
+      newPassAgain: '',
       newUserInfo: ''
     }
   },
   template: '<div>Create new account.<br>\
-                Username: <input v-model="newUname" maxlength="32"><br>\
-                E-mail: <input v-model="newEmail" maxlength="64"><br>\
-                Password: <input v-model="newPass" maxlength="64"><br>\
-                User info: <textarea v-model="newUserInfo" maxlength="300"></textarea><br>\
+                <label for="uname">Username</label><br>\
+                <input id="uname" v-model="newUname" maxlength="32"><br>\
+                <label for="email">e-mail</label><br>\
+                <input id="email" v-model="newEmail" maxlength="64"><br>\
+                <label for="passw">Password</label><br>\
+                <input id="passw" v-model="newPass" maxlength="64"><br>\
+                <label for="pass2">Password again</label><br>\
+                <input id="pass2" v-model="newPassAgain" maxlength="64"><br>\
+                <label for="uinfo">User info</label><br>\
+                <textarea id="uinfo" v-model="newUserInfo" maxlength="300"></textarea><br>\
                 <button v-on:click="sendSignUp">Send</button><br>\
             </div>',
   methods: {
@@ -207,15 +214,20 @@ const SignUp = {
         password: this.newPass,
         info: this.newUserInfo 
       }
-      axios.post('/add_user', data)
-          .then(response => {
-            this.sharedState.userFeedback = response.data;
-            this.sharedState.showMessage = true;
-            this.$router.push("/");
-          })
-          .catch(e => {
-            console.log(e);
-          });
+      if (this.newPass != this.newPassAgain) {
+        this.sharedState.userFeedback = "Password doesn't match!";
+        console.log("Failed to create account.");
+      } else {
+        axios.post('/add_user', data)
+            .then(response => {
+              this.sharedState.userFeedback = response.data;
+              this.sharedState.showMessage = true;
+              this.$router.push("/");
+            })
+            .catch(e => {
+              console.log(e);
+            });
+      }
     }
   }
 };
@@ -233,13 +245,13 @@ const FrontPage = {
   },
   template: '<div>\
               <div>Link sharing website. Under development, not meant for real use, database may be wiped anytime.</div>\
-              <div>Source: https://github.com/thenriks/linkshare-public</div>\
-              <div>Newest members:</div>\
+              <div>Source: <a href="https://github.com/thenriks/linkshare-public">https://github.com/thenriks/linkshare-public</a></div>\
               <div v-if="loading"> \
                 Loading... \
               </div> \
               <div v-else>\
                 <table id=\"new-users\"> \
+                  <th>Newest members:</th>\
                   <tr v-for=\"user in newUsers\" :key=\"user.username\"> \
                     <td><a v-bind:href=user.id> {{user.username}} </a></td>\
                   </tr> \
